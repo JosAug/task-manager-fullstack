@@ -70,7 +70,8 @@ io.use((socket, next) => {
 registerChatHandlers(io);
 
 server.listen(PORT, () => {
-  console.log(`API http://localhost:${PORT}`);
-  console.log(`Swagger UI http://localhost:${PORT}/api/docs`);
+  const prod = process.env.NODE_ENV === "production";
+  console.log(`API escutando na porta ${PORT}${prod ? " (use a URL pública do host)" : ` — local http://localhost:${PORT}`}`);
+  console.log(`Swagger: /api/docs`);
   console.log(`Socket.IO /socket.io (chat) — origens: ${origins.join(", ")}`);
 });
