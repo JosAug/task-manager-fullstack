@@ -39,8 +39,8 @@ Suba API + frontend:
 npm run dev
 ```
 
-- **Frontend:** http://localhost:5173  
-- **API:** http://localhost:4000  
+- **Frontend:** https://task-manager-fullstack-lovat.vercel.app/login
+- **API:** https://task-manager-fullstack-wacf.onrender.com
 - **Swagger:** http://localhost:4000/api/docs  
 - **Chat:** após entrar, use o botão flutuante **💬** (WebSocket na mesma origem em dev).
 
