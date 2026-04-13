@@ -10,14 +10,30 @@ import { openApiSpec } from "./openapi.js";
 import { verifyAccessToken } from "./middleware/auth.js";
 import { clientOrigins } from "./config/origins.js";
 import { registerChatHandlers } from "./realtime/chat.js";
+import { assertProductionConfig } from "./config/production.js";
 import db from "./db.js";
 
 const app = express();
 const PORT = Number(process.env.PORT) || 4000;
+const HOST = process.env.HOST || "0.0.0.0";
 const origins = clientOrigins();
+
+if (process.env.NODE_ENV === "production") {
+  app.set("trust proxy", 1);
+}
 
 app.use(cors({ origin: origins, credentials: true }));
 app.use(express.json({ limit: "1mb" }));
+
+app.get("/", (_req, res) => {
+  res.json({
+    service: "todo-api",
+    health: "/api/health",
+    docs: "/api/docs",
+    openapi: "/api/openapi.json",
+    socket: "/socket.io",
+  });
+});
 
 app.get("/api/health", (_, res) => res.json({ ok: true }));
 
@@ -69,9 +85,13 @@ io.use((socket, next) => {
 
 registerChatHandlers(io);
 
-server.listen(PORT, () => {
+assertProductionConfig();
+
+server.listen(PORT, HOST, () => {
   const prod = process.env.NODE_ENV === "production";
-  console.log(`API escutando na porta ${PORT}${prod ? " (use a URL pública do host)" : ` — local http://localhost:${PORT}`}`);
+  console.log(
+    `API em http://${HOST}:${PORT}${prod ? " (URL pública do host)" : " — http://localhost:" + PORT}`
+  );
   console.log(`Swagger: /api/docs`);
   console.log(`Socket.IO /socket.io (chat) — origens: ${origins.join(", ")}`);
 });

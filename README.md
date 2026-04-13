@@ -51,17 +51,27 @@ npm run dev
 Padrão típico: **frontend estático** em um host e **Node (API + WebSockets)** em outro.
 
 1. **Backend (Render, Railway, Fly.io, etc.)**  
-   - Comando: `npm start` na pasta `server` (ou raiz apontando para `server`).  
-   - Variáveis: `PORT` (muitos hosts definem sozinhos), `JWT_SECRET`, `CLIENT_ORIGIN` = URL **exata** do seu site (ex.: `https://meu-app.vercel.app`). Várias origens: separadas por **vírgula**.  
-   - **WebSockets:** o chat usa **Socket.IO** em `/socket.io` no mesmo servidor da API — o plano do host precisa suportar WebSocket (evite só “serverless puro” sem WS).
+   - **Root directory:** `server`  
+   - **Build:** `npm install`  
+   - **Start:** `npm start`  
+   - **Node:** 20+ (`server/package.json` → `engines`)  
+   - **Variáveis obrigatórias em produção**  
+     - `NODE_ENV=production` (muitos hosts já definem)  
+     - `JWT_SECRET`: string **aleatória com 24+ caracteres** (o processo **não sobe** se estiver fraca ou igual ao exemplo do `.env.example`)  
+     - `CLIENT_ORIGIN`: URL **exata** do front (ex.: `https://meu-app.vercel.app`). Várias origens: **vírgula**. Sem isso, CORS/Socket.IO ficam só em `http://localhost:5173`.  
+   - **Opcionais:** `SQLITE_PATH` — caminho absoluto do `.db` (ex.: volume persistente `/data/app.db`); `HOST` (padrão `0.0.0.0`).  
+   - **WebSockets:** Socket.IO em `/socket.io` no mesmo processo da API — use host com **WebSocket** (evite serverless HTTP “puro” sem WS).  
+   - Na raiz há um **`render.yaml`** opcional (Blueprint no Render); ajuste nomes e crie `CLIENT_ORIGIN` no painel após o primeiro deploy.
 
 2. **Frontend (Vercel, Netlify, Cloudflare Pages, etc.)**  
-   - Build: `npm run build` dentro de `client`.  
-   - Defina **`VITE_API_URL`** com a URL pública da API **sem barra no final** (ex.: `https://meu-api.onrender.com`). Isso vale no **momento do build**.  
-   - Copie `client/.env.example` → `client/.env` (ou configure as variáveis no painel do host).
+   - **Root:** `client`  
+   - **Build:** `npm install && npm run build` (ou `npm ci` em CI)  
+   - **Publish directory:** `client/dist`  
+   - **`VITE_API_URL`:** URL pública da API **sem barra no final**, definida no **build** (variável de ambiente do painel ou `client/.env` antes do build). Na raiz: `npm run build:client` após configurar o env.  
+   - **SPA:** `client/public/_redirects` (Netlify) e `client/vercel.json` (Vercel) enviam rotas do React para `index.html`.
 
 3. **SQLite em produção**  
-   - Em disco efêmero (free tier) o arquivo pode **sumir** a cada deploy. Para algo estável, use volume persistente no host ou migre para **PostgreSQL** (recomendado além do estudo local).
+   - Em disco **efêmero** (free tier) o banco pode **zerar** a cada deploy/restart. Use **`SQLITE_PATH`** apontando para **volume persistente** no host ou migre para **PostgreSQL** (recomendado para dados estáveis).
 
 ---
 

@@ -4,10 +4,24 @@ import { fileURLToPath } from "url";
 import fs from "fs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const dataDir = path.join(__dirname, "..", "data");
+const defaultDataDir = path.join(__dirname, "..", "data");
+const sqlitePathEnv = process.env.SQLITE_PATH?.trim();
+
+let dbFile;
+let dataDir;
+if (sqlitePathEnv) {
+  dbFile = path.isAbsolute(sqlitePathEnv)
+    ? sqlitePathEnv
+    : path.join(process.cwd(), sqlitePathEnv);
+  dataDir = path.dirname(dbFile);
+} else {
+  dataDir = defaultDataDir;
+  dbFile = path.join(dataDir, "app.db");
+}
+
 if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
 
-const db = new Database(path.join(dataDir, "app.db"));
+const db = new Database(dbFile);
 db.pragma("foreign_keys = ON");
 
 db.exec(`

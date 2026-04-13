@@ -1,0 +1,17 @@
+# Blueprint opcional: Render → New → Blueprint → conecte o repo e ajuste variáveis sensíveis no painel.
+# https://render.com/docs/blueprint-spec
+services:
+  - type: web
+    name: task-manager-api
+    runtime: node
+    plan: free
+    rootDir: server
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: JWT_SECRET
+        generateValue: true
+      - key: CLIENT_ORIGIN
+        sync: false
