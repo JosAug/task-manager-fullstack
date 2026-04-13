@@ -1,4 +1,7 @@
-# Blueprint opcional: Render → New → Blueprint → conecte o repo e ajuste variáveis sensíveis no painel.
+# Blueprint opcional: Render → Blueprint → conecte o repo.
+# Com rootDir: server → build/start usam server/package.json.
+# Se o serviço foi criado na mão com raiz do repo, deixe "Root Directory" vazio:
+# o package.json da raiz tem postinstall (instala server/) e start (sobe a API).
 # https://render.com/docs/blueprint-spec
 services:
   - type: web
